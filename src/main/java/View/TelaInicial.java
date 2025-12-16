@@ -22,7 +22,7 @@ import javax.swing.text.StyledDocument;
  */
 public class TelaInicial extends javax.swing.JFrame {
     
-    private final DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     
     private DiarioService diario = new DiarioService();
 
@@ -122,7 +122,7 @@ public class TelaInicial extends javax.swing.JFrame {
     if (texto == null || texto.trim().isEmpty()) return;
 
     try {
-        String dataStr = JOptionPane.showInputDialog(this, "Digite a data do evento (yyyy-MM-dd HH:mm):");
+        String dataStr = JOptionPane.showInputDialog(this, "Digite a data do evento (dd/MM/yyyy HH:mm):");
         if (dataStr == null || dataStr.trim().isEmpty()) return;
 
         LocalDateTime dataEvento = LocalDateTime.parse(dataStr, formatoData);
@@ -132,7 +132,7 @@ public class TelaInicial extends javax.swing.JFrame {
         atualizarTela();
 
     } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Erro ao salvar o evento! Verifique o formato da data: yyyy-MM-dd HH:mm");
+        JOptionPane.showMessageDialog(this, "Erro ao salvar o evento! Verifique o formato da data: dd/MM/yyyy HH:mm");
     }    // TODO add your handling code here:
     }//GEN-LAST:event_adicionarNovoActionPerformed
 
@@ -191,7 +191,7 @@ private void atualizarTela() {
    try {
         List<String> linhas = diario.lerLinhas();
         StyledDocument doc = textoAgenda.getStyledDocument();
-        doc.remove(0, doc.getLength()); // limpa
+        doc.remove(0, doc.getLength()); 
 
         for (int i = 0; i < linhas.size(); i++) {
             String linha = linhas.get(i);
@@ -203,7 +203,7 @@ private void atualizarTela() {
             try {
                 dataEvento = LocalDateTime.parse(dataStr, formatoData);
             } catch (Exception ex) {
-                // linha com formato inválido: exibe normal (sem cor)
+                
                 doc.insertString(doc.getLength(), (i+1) + ") " + linha + "\n", null);
                 continue;
             }

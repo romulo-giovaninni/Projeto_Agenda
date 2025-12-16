@@ -17,7 +17,7 @@ import java.util.List;
 public class DiarioService {
     
     private static final String ARQUIVO = "diario.txt";
-    private static final DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     /**
      * Salva um novo evento no arquivo

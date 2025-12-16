@@ -82,8 +82,7 @@ public class AgendaController {
             return;
         }
 
-        String input = JOptionPane.showInputDialog(null,
-                "Qual linha deseja deletar? (0 a " + (model.getTamanho() - 1) + ")");
+        String input = JOptionPane.showInputDialog(null);
 
         if (input == null) return;
 
