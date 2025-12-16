@@ -5,7 +5,7 @@
 package View;
 
 import Controller.AgendaController;
-import Model.DiarioService;
+import Model.Agenda;
 import java.awt.Color;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,16 +23,15 @@ import javax.swing.text.StyledDocument;
 public class TelaInicial extends javax.swing.JFrame {
     
     private final DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    
-    private DiarioService diario = new DiarioService();
+    private AgendaController controller;
 
     /**
      * Creates new form TelaInicial
      */
     public TelaInicial() {
         initComponents();
-        atualizarTela();
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -118,150 +117,30 @@ public class TelaInicial extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void adicionarNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adicionarNovoActionPerformed
-    String texto = JOptionPane.showInputDialog(this, "Digite o texto:");
-    if (texto == null || texto.trim().isEmpty()) return;
-
-    try {
-        String dataStr = JOptionPane.showInputDialog(this, "Digite a data do evento (dd/MM/yyyy HH:mm):");
-        if (dataStr == null || dataStr.trim().isEmpty()) return;
-
-        LocalDateTime dataEvento = LocalDateTime.parse(dataStr, formatoData);
-
-        diario.escreverNovo(texto, dataEvento);
-
-        atualizarTela();
-
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Erro ao salvar o evento! Verifique o formato da data: dd/MM/yyyy HH:mm");
-    }    // TODO add your handling code here:
+    if (controller != null) {
+        controller.adicionar();
+        controller.atualizarTela();
+        // TODO add your handling code here:
     }//GEN-LAST:event_adicionarNovoActionPerformed
-
+    }
     private void editarDaAgendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarDaAgendaActionPerformed
-    try {
-            List<String> linhas = diario.lerLinhas();
-            if (linhas.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Diário vazio.");
-                return;
-            }
-
-            String numero = JOptionPane.showInputDialog(this, "Número da entrada para editar:");
-            if (numero == null) return;
-
-            int idx = Integer.parseInt(numero) - 1;
-
-            if (idx < 0 || idx >= linhas.size()) {
-                JOptionPane.showMessageDialog(this, "Entrada inválida.");
-                return;
-            }
-
-            String novo = JOptionPane.showInputDialog(this, "Novo texto:");
-            if (novo == null || novo.trim().isEmpty()) return;
-
-            diario.editarEntrada(idx, novo);
-            atualizarTela();
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao editar entrada.");
+    if (controller != null) {
+        controller.editar();
+        controller.atualizarTela();
         }    // TODO add your handling code here:
     }//GEN-LAST:event_editarDaAgendaActionPerformed
 
     private void deletarDaAgendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletarDaAgendaActionPerformed
-    try {
-            List<String> linhas = diario.lerLinhas();
-            if (linhas.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Diário vazio.");
-                return;
-            }
-
-            String numero = JOptionPane.showInputDialog(this, "Número da entrada para deletar:");
-            if (numero == null) return;
-
-            int idx = Integer.parseInt(numero) - 1;
-
-            diario.apagarEntrada(idx);
-            atualizarTela();
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao deletar entrada.");
+    if (controller != null) {
+        controller.deletar();
+        controller.atualizarTela();
         }    // TODO add your handling code here:
     }//GEN-LAST:event_deletarDaAgendaActionPerformed
 
 
-private void atualizarTela() {
-   try {
-        List<String> linhas = diario.lerLinhas();
-        StyledDocument doc = textoAgenda.getStyledDocument();
-        doc.remove(0, doc.getLength()); 
-
-        for (int i = 0; i < linhas.size(); i++) {
-            String linha = linhas.get(i);
-            String[] partes = linha.split("\\|", 2);
-            String dataStr = partes.length > 0 ? partes[0] : "";
-            String texto = partes.length > 1 ? partes[1] : "";
-
-            LocalDateTime dataEvento;
-            try {
-                dataEvento = LocalDateTime.parse(dataStr, formatoData);
-            } catch (Exception ex) {
-                
-                doc.insertString(doc.getLength(), (i+1) + ") " + linha + "\n", null);
-                continue;
-            }
-
-            long minutosRest = ChronoUnit.MINUTES.between(LocalDateTime.now(), dataEvento);
-            String exibicao = (i + 1) + ") " + dataStr + " - " + texto + "\n";
-
-            SimpleAttributeSet estilo = new SimpleAttributeSet();
-            if (minutosRest <= 30 && minutosRest >= 0) {
-                StyleConstants.setForeground(estilo, Color.RED);
-            }
-
-            doc.insertString(doc.getLength(), exibicao, estilo);
-        }
-
-    } catch (Exception e) {
-        textoAgenda.setText("Erro ao carregar o diário.");
-    }
+    public javax.swing.JTextPane getTextoAgenda() {
+        return textoAgenda;
 }
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TelaInicial.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TelaInicial.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TelaInicial.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TelaInicial.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TelaInicial().setVisible(true);
-            }
-        });
-    }
-    public void setController(AgendaController controller) {
-    this.controller = controller;
-}
-    private AgendaController controller;
     
     public String getTexto() {
     return textoAgenda.getText();
@@ -269,6 +148,41 @@ private void atualizarTela() {
     public void setTexto(String texto) {
     textoAgenda.setText(texto);
 }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        Agenda model = new Agenda();
+    try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
+            }
+        }
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
+
+    java.awt.EventQueue.invokeLater(() ->  {
+        
+        TelaInicial tela = new TelaInicial();
+        AgendaController controller = new AgendaController(model, tela);
+        controller.atualizarTela();  
+        tela.setVisible(true);
+    });
+}
+    public void setController(AgendaController controller) {
+    this.controller = controller;
+    }
+
+    
+
+ 
+    
+    
+    
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
